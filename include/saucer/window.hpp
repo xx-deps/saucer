@@ -120,6 +120,7 @@ namespace saucer
         [[sc::thread_safe]] [[nodiscard]] window_decoration decoration() const;
 
       public:
+        [[sc::thread_safe]] [[nodiscard]] std::pair<int, int> pos() const;
         [[sc::thread_safe]] [[nodiscard]] std::pair<int, int> size() const;
         [[sc::thread_safe]] [[nodiscard]] std::pair<int, int> max_size() const;
         [[sc::thread_safe]] [[nodiscard]] std::pair<int, int> min_size() const;
@@ -151,6 +152,7 @@ namespace saucer
         [[sc::thread_safe]] void set_decoration(window_decoration decoration);
 
       public:
+        [[sc::thread_safe]] void set_pos(int x, int y);
         [[sc::thread_safe]] void set_size(int width, int height);
         [[sc::thread_safe]] void set_max_size(int width, int height);
         [[sc::thread_safe]] void set_min_size(int width, int height);

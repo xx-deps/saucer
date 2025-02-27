@@ -165,7 +165,19 @@ namespace saucer
 
         return window_decoration::full;
     }
+    std::pair<int, int> window::pos() const
+    {
+        if (!m_parent->thread_safe())
+        {
+            return m_parent->dispatch([this] { return pos(); });
+        }
 
+        RECT rect;
+        GetWindowRect(m_impl->hwnd.get(), &rect);
+
+        return {rect.left, rect.top};
+    }
+    
     std::pair<int, int> window::size() const
     {
         if (!m_parent->thread_safe())
@@ -439,6 +451,15 @@ namespace saucer
         utils::extend_frame(m_impl->hwnd.get(), {0, 0, titlebar ? 0 : 2, 0});
 
         SetWindowPos(m_impl->hwnd.get(), nullptr, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_NOACTIVATE | SWP_FRAMECHANGED);
+    }
+    void window::set_pos(int x, int y)
+    {
+        if (!m_parent->thread_safe())
+        {
+            return m_parent->dispatch([this, x, y] { set_pos(x, y); });
+        }
+
+        SetWindowPos(m_impl->hwnd.get(), nullptr, x, y, 0, 0, SWP_NOSIZE | SWP_NOACTIVATE | SWP_NOZORDER);
     }
 
     void window::set_size(int width, int height)
