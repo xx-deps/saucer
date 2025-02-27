@@ -145,7 +145,8 @@ namespace saucer
       public:
         [[sc::thread_safe]] void set_always_on_top(bool enabled);
         [[sc::thread_safe]] void set_click_through(bool enabled);
-
+        [[sc::thread_safe]] void set_skip_taskbar(bool enabled);
+        
       public:
         [[sc::thread_safe]] void set_icon(const icon &icon);
         [[sc::thread_safe]] void set_title(const std::string &title);

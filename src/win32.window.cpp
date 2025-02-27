@@ -12,6 +12,7 @@
 #include <flagpp/flags.hpp>
 
 #include <dwmapi.h>
+#include <winuser.h>
 
 template <>
 constexpr bool flagpp::enabled<saucer::window_edge> = true;
@@ -177,7 +178,7 @@ namespace saucer
 
         return {rect.left, rect.top};
     }
-    
+
     std::pair<int, int> window::size() const
     {
         if (!m_parent->thread_safe())
@@ -368,6 +369,28 @@ namespace saucer
 
         auto *parent = enabled ? HWND_TOPMOST : HWND_NOTOPMOST;
         SetWindowPos(m_impl->hwnd.get(), parent, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOACTIVATE | SWP_NOSIZE);
+    }
+    
+    void window::set_skip_taskbar(bool enabled)
+    {
+        if (!m_parent->thread_safe())
+        {
+            return m_parent->dispatch([this, enabled] { set_skip_taskbar(enabled); });
+        }
+
+        static constexpr auto flags = WS_EX_TOOLWINDOW;
+        auto current                = GetWindowLongPtr(m_impl->hwnd.get(), GWL_EXSTYLE);
+
+        if (enabled)
+        {
+            current |= flags;
+        }
+        else
+        {
+            current &= ~flags;
+        }
+
+        SetWindowLongPtrW(m_impl->hwnd.get(), GWL_EXSTYLE, current);
     }
 
     void window::set_click_through(bool enabled)
