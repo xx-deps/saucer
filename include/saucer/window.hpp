@@ -119,6 +119,9 @@ namespace saucer
         [[sc::thread_safe]] [[nodiscard]] std::string title() const;
         [[sc::thread_safe]] [[nodiscard]] window_decoration decoration() const;
 
+        public:
+        [[sc::thread_safe]] [[nodiscard]] std::pair<int, int> mouse_pos() const;
+
       public:
         [[sc::thread_safe]] [[nodiscard]] std::pair<int, int> pos() const;
         [[sc::thread_safe]] [[nodiscard]] std::pair<int, int> size() const;

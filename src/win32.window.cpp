@@ -166,6 +166,21 @@ namespace saucer
 
         return window_decoration::full;
     }
+    
+    std::pair<int, int> window::mouse_pos() const
+    {
+        if (!m_parent->thread_safe())
+        {
+            return m_parent->dispatch([this] { return mouse_pos(); });
+        }
+
+        POINT  point;
+        GetCursorPos(  &point);
+
+        return {point.x, point.y};
+    }
+
+
     std::pair<int, int> window::pos() const
     {
         if (!m_parent->thread_safe())
