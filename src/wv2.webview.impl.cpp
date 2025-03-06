@@ -271,6 +271,16 @@ namespace saucer
             impl->controller->put_IsVisible(w_param != SIZE_MINIMIZED);
             impl->controller->put_Bounds(RECT{0, 0, LOWORD(l_param), HIWORD(l_param)});
             break;
+        case WM_NCHITTEST: {
+
+            // POINT pt = {GET_X_LPARAM(l_param), GET_Y_LPARAM(l_param)};
+            // ScreenToClient(hwnd, &pt);
+
+            // Check if the point is over a non-transparent element in WebView2
+            // BOOL isTransparent = TRUE;
+
+            return HTTRANSPARENT;
+        }
         }
 
         return CallWindowProcW(impl->o_wnd_proc, hwnd, msg, w_param, l_param);
