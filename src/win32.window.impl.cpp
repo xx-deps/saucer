@@ -144,7 +144,7 @@ namespace saucer
 
             // Check if the point is over a non-transparent element in WebView2
             BOOL isTransparent = TRUE;
-            if (pt.x > 10)
+            if (pt.x > 100)
             {
                 isTransparent = FALSE;
             }
