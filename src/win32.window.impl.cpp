@@ -137,18 +137,51 @@ namespace saucer
 
             return 0;
         }
-        case WM_NCHITTEST: {
+        case WM_PAINT: {
 
             // POINT pt = {GET_X_LPARAM(l_param), GET_Y_LPARAM(l_param)};
             // ScreenToClient(hwnd, &pt);
 
             // // Check if the point is over a non-transparent element in WebView2
             // BOOL isTransparent = TRUE;
-
-            return HTTRANSPARENT;
+            PAINTSTRUCT ps;
+            HDC hdc = BeginPaint(hwnd, &ps);
+            OnPaint(hwnd, hdc);
+            EndPaint(hwnd, &ps);
         }
         }
 
         return CallWindowProcW(impl->o_wnd_proc, hwnd, msg, w_param, l_param);
+    }
+    void window::impl::OnPaint(HWND hwnd, HDC hdc)
+    {
+        // create mem dc
+        RECT rect;
+        GetClientRect(hwnd, &rect);
+        int w              = rect.right - rect.left;
+        int h              = rect.bottom - rect.top;
+        HDC hMemDC         = CreateCompatibleDC(hdc);
+        HBITMAP hMemBitmap = CreateCompatibleBitmap(hdc, w, h);
+        HBITMAP oldBM      = (HBITMAP)SelectObject(hMemDC, hMemBitmap);
+
+        // draw
+        Gdiplus::Graphics graphics(hMemDC);
+
+        Gdiplus::SolidBrush brush(Gdiplus::Color(0x11ffffff));
+        graphics.FillRectangle(&brush, 0, 0, w, h);
+        // alpha
+        POINT ptSrc    = {0, 0};
+        SIZE szLayered = {w, h};
+        BLENDFUNCTION bf;
+        bf.AlphaFormat         = AC_SRC_ALPHA;
+        bf.BlendFlags          = 0;
+        bf.BlendOp             = AC_SRC_OVER;
+        bf.SourceConstantAlpha = 255;
+        ::UpdateLayeredWindow(hwnd, hdc, nullptr, &szLayered, hMemDC, &ptSrc, 0, &bf, ULW_ALPHA);
+
+        // clear
+        SelectObject(hMemDC, oldBM);
+        DeleteObject(hMemBitmap);
+        DeleteDC(hMemDC);
     }
 } // namespace saucer
