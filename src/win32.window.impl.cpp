@@ -137,6 +137,20 @@ namespace saucer
 
             return 0;
         }
+        case WM_NCHITTEST: {
+
+            POINT pt = {GET_X_LPARAM(l_param), GET_Y_LPARAM(l_param)};
+            ScreenToClient(hwnd, &pt);
+
+            // Check if the point is over a non-transparent element in WebView2
+            BOOL isTransparent = TRUE;
+            if (pt.x > 10)
+            {
+                isTransparent = FALSE;
+            }
+
+            return isTransparent ? HTTRANSPARENT : HTCLIENT;
+        }
         }
 
         return CallWindowProcW(impl->o_wnd_proc, hwnd, msg, w_param, l_param);
