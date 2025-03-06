@@ -8,6 +8,10 @@ namespace saucer
         {
             return DefWindowProcW(hwnd, msg, w_param, l_param);
         }
+        if (msg == WM_NCHITTEST)
+        {
+            return HTTRANSPARENT;
+        }
 
         delete reinterpret_cast<safe_message *>(l_param);
         return 0;
