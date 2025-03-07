@@ -411,7 +411,8 @@ namespace saucer
     {
         if (!m_parent->thread_safe())
         {
-            return m_parent->dispatch([this, enabled] { set_clickable(enabled); });
+            m_parent->dispatch([this, enabled] { set_clickable(enabled); });
+            return;
         }
 
         static constexpr auto flags = WS_EX_TRANSPARENT;
@@ -428,12 +429,11 @@ namespace saucer
         current |= WS_EX_LAYERED;
         SetWindowLongPtrW(m_impl->hwnd.get(), GWL_EXSTYLE, current);
 
-        SetLayeredWindowAttributes(m_impl->hwnd.get(), RGB(255, 255, 255), 255, 0);
         if (!enabled)
         {
             return;
         }
-
+        SetLayeredWindowAttributes(m_impl->hwnd.get(), RGB(255, 255, 255), 255, 0);
     }
     void window::set_click_through(bool enabled)
     {

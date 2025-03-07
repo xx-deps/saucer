@@ -8,6 +8,7 @@
 
 #include <cassert>
 
+#include <iostream>
 #include <rebind/utils/enum.hpp>
 
 #include <fmt/core.h>
@@ -269,11 +270,24 @@ namespace saucer
         switch (msg)
         {
         case WM_SHOWWINDOW:
+            std::cout << "WM_SHOWWINDOW(w2)" << std::endl;
             impl->controller->put_IsVisible(static_cast<BOOL>(w_param));
             break;
         case WM_SIZE:
             impl->controller->put_IsVisible(w_param != SIZE_MINIMIZED);
             impl->controller->put_Bounds(RECT{0, 0, LOWORD(l_param), HIWORD(l_param)});
+            break;
+        case WM_MOUSEMOVE:
+            std::cout << "WM_MOUSEMOVE(w2)" << std::endl;
+            break;
+        case WM_NCHITTEST:
+            std::cout << "WM_NCHITTEST(w2)" << std::endl;
+            break;
+        case WM_LBUTTONUP:
+            std::cout << "WM_LBUTTONUP(w2)" << std::endl;
+            break;
+        case WM_LBUTTONDOWN:
+            std::cout << "WM_LBUTTONDOWN(w2)" << std::endl;
             break;
         }
 
