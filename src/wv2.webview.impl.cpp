@@ -300,10 +300,10 @@ namespace saucer
 
             // // Check if the point is over a non-transparent element in WebView2
             // BOOL isTransparent = TRUE;
-            PAINTSTRUCT ps;
-            HDC hdc = BeginPaint(hwnd, &ps);
-            impl->on_paint(hwnd, hdc);
-            EndPaint(hwnd, &ps);
+            // PAINTSTRUCT ps;
+            // HDC hdc = BeginPaint(hwnd, &ps);
+            // impl->on_paint(hwnd, hdc);
+            // EndPaint(hwnd, &ps);
         }
         }
 
@@ -311,6 +311,7 @@ namespace saucer
     }
     void webview::impl::on_paint(HWND hwnd, HDC hdc)
     {
+      
         // create mem dc
         RECT rect;
         GetClientRect(hwnd, &rect);

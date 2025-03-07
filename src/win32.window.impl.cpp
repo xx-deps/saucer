@@ -185,10 +185,10 @@ namespace saucer
         auto color = Gdiplus::Color(0xffff0000);
         if (isDragging)
         {
-            color = Gdiplus::Color(0xff00ff00);
+            color = Gdiplus::Color(0xff0000ff);
         }
         Gdiplus::SolidBrush brush(color);
-        graphics.FillRectangle(&brush, w / 3 * 2, 0, w / 3, h);
+        graphics.FillRectangle(&brush, w / 3, 0, w / 3, h);
         // alpha
         POINT ptSrc    = {0, 0};
         SIZE szLayered = {w, h};
