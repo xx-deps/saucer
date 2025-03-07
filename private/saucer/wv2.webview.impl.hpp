@@ -63,5 +63,6 @@ namespace saucer
       public:
         WNDPROC o_wnd_proc;
         static LRESULT CALLBACK wnd_proc(HWND, UINT, WPARAM, LPARAM);
+        static void OnPaint(HWND hwnd, HDC hdc);
     };
 } // namespace saucer

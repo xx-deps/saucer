@@ -137,18 +137,18 @@ namespace saucer
 
             return 0;
         }
-        case WM_PAINT: {
+        // case WM_PAINT: {
 
-            // POINT pt = {GET_X_LPARAM(l_param), GET_Y_LPARAM(l_param)};
-            // ScreenToClient(hwnd, &pt);
+        //     // POINT pt = {GET_X_LPARAM(l_param), GET_Y_LPARAM(l_param)};
+        //     // ScreenToClient(hwnd, &pt);
 
-            // // Check if the point is over a non-transparent element in WebView2
-            // BOOL isTransparent = TRUE;
-            PAINTSTRUCT ps;
-            HDC hdc = BeginPaint(hwnd, &ps);
-            OnPaint(hwnd, hdc);
-            EndPaint(hwnd, &ps);
-        }
+        //     // // Check if the point is over a non-transparent element in WebView2
+        //     // BOOL isTransparent = TRUE;
+        //     PAINTSTRUCT ps;
+        //     HDC hdc = BeginPaint(hwnd, &ps);
+        //     OnPaint(hwnd, hdc);
+        //     EndPaint(hwnd, &ps);
+        // }
         }
 
         return CallWindowProcW(impl->o_wnd_proc, hwnd, msg, w_param, l_param);
@@ -168,9 +168,9 @@ namespace saucer
         Gdiplus::Graphics graphics(hMemDC);
 
         Gdiplus::SolidBrush brush(Gdiplus::Color(0xffff0000));
-        graphics.FillRectangle(&brush, 0, h/2, w, h/2);
+        graphics.FillRectangle(&brush, 0, 0, w, h);
         // alpha
-        POINT ptSrc    = {0, h/2};
+        POINT ptSrc    = {0, 0};
         SIZE szLayered = {w, h};
         BLENDFUNCTION bf;
         bf.AlphaFormat         = AC_SRC_ALPHA;
