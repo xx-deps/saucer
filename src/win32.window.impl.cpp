@@ -1,7 +1,9 @@
 #include "win32.window.impl.hpp"
 
 #include "win32.app.impl.hpp"
+#include <iostream>
 #include <windowsx.h>
+#include <winuser.h>
 
 namespace saucer
 {
@@ -138,6 +140,19 @@ namespace saucer
 
             return 0;
         }
+        case WM_NCHITTEST: {
+
+            // POINT pt = {GET_X_LPARAM(l_param), GET_Y_LPARAM(l_param)};
+            // ScreenToClient(hwnd, &pt);
+
+            // // Check if the point is over a non-transparent element in WebView2
+            // BOOL isTransparent = TRUE;
+            POINT pt;
+            pt.x = GET_X_LPARAM(l_param);
+            pt.y = GET_Y_LPARAM(l_param);
+
+            std::cout << "WM_NCHITTEST" << std::endl;
+        }
         case WM_PAINT: {
 
             // POINT pt = {GET_X_LPARAM(l_param), GET_Y_LPARAM(l_param)};
@@ -145,6 +160,7 @@ namespace saucer
 
             // // Check if the point is over a non-transparent element in WebView2
             // BOOL isTransparent = TRUE;
+            std::cout << "WM_PAINT" << std::endl;
             PAINTSTRUCT ps;
             HDC hdc = BeginPaint(hwnd, &ps);
             window->m_impl->on_paint(hwnd, hdc);
@@ -155,14 +171,29 @@ namespace saucer
             POINT pt;
             pt.x = GET_X_LPARAM(l_param);
             pt.y = GET_Y_LPARAM(l_param);
-
+            std::cout << "WM_LBUTTONDOWN" << pt.x << "," << pt.y << std::endl;
             window->m_impl->on_mouse_down_left(hwnd, pt);
+        }
+        case WM_LBUTTONUP: {
+            POINT pt;
+            pt.x = GET_X_LPARAM(l_param);
+            pt.y = GET_Y_LPARAM(l_param);
+            std::cout << "WM_LBUTTONUP" << pt.x << "," << pt.y << std::endl;
+            window->m_impl->on_mouse_up_left(hwnd, pt);
+        }
+        case WM_MOUSELEAVE: {
+            POINT pt;
+            pt.x = GET_X_LPARAM(l_param);
+            pt.y = GET_Y_LPARAM(l_param);
+            std::cout << "WM_MOUSELEAVE" << pt.x << "," << pt.y << std::endl;
+            window->m_impl->on_mouse_leave(hwnd, pt);
         }
         case WM_MOUSEMOVE: {
             POINT pt;
             pt.x                = GET_X_LPARAM(l_param);
             pt.y                = GET_Y_LPARAM(l_param);
             bool isMousePressed = l_param & MK_LBUTTON;
+            std::cout << "WM_MOUSEMOVE" << pt.x << "," << pt.y << std::endl;
             window->m_impl->on_mouse_move(hwnd, pt, isMousePressed);
         }
         }
@@ -217,7 +248,7 @@ namespace saucer
         isDragging = true;
         SetCapture(hwnd);
     }
-    void window::impl::on_mouse_button_left(HWND, POINT)
+    void window::impl::on_mouse_up_left(HWND, POINT)
     {
         isDragging = false;
     }
