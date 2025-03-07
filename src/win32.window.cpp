@@ -166,7 +166,7 @@ namespace saucer
 
         return window_decoration::full;
     }
-    
+
     std::pair<int, int> window::mouse_pos() const
     {
         if (!m_parent->thread_safe())
@@ -174,12 +174,11 @@ namespace saucer
             return m_parent->dispatch([this] { return mouse_pos(); });
         }
 
-        POINT  point;
-        GetCursorPos(  &point);
+        POINT point;
+        GetCursorPos(&point);
 
         return {point.x, point.y};
     }
-
 
     std::pair<int, int> window::pos() const
     {
@@ -283,7 +282,7 @@ namespace saucer
         {
             return m_parent->dispatch([this] { start_drag(); });
         }
-
+        return;
         ReleaseCapture();
         SendMessage(m_impl->hwnd.get(), WM_SYSCOMMAND, 0xF012 /*SC_DRAGMOVE*/, 0);
     }
@@ -385,7 +384,7 @@ namespace saucer
         auto *parent = enabled ? HWND_TOPMOST : HWND_NOTOPMOST;
         SetWindowPos(m_impl->hwnd.get(), parent, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOACTIVATE | SWP_NOSIZE);
     }
-    
+
     void window::set_skip_taskbar(bool enabled)
     {
         if (!m_parent->thread_safe())

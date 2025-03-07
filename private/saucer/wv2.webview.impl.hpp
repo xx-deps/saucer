@@ -2,6 +2,7 @@
 
 #include "webview.hpp"
 
+#include <windef.h>
 #include <wrl.h>
 #include <WebView2.h>
 #include <WebView2EnvironmentOptions.h>
@@ -63,6 +64,16 @@ namespace saucer
       public:
         WNDPROC o_wnd_proc;
         static LRESULT CALLBACK wnd_proc(HWND, UINT, WPARAM, LPARAM);
-        static void OnPaint(HWND hwnd, HDC hdc);
+        void OnPaint(HWND hwnd, HDC hdc);
+        void OnLButtonDown(HWND hwnd, POINT pt);
+        void OnLButtonUp(HWND hwnd, POINT pt);
+        void OnMouseMove(HWND hwnd, POINT pt);
+        void OnMouseEnter(HWND hwnd, POINT pt);
+        void OnMouseLeave(HWND hwnd, POINT pt);
+      private:
+        bool isDragging = false;
+        POINT cursorPrevious = {0, 0};
+        POINT cursorNow = {0, 0};
+        POINT windowPostionNow = {0, 0};
     };
 } // namespace saucer

@@ -6,6 +6,7 @@
 #include "win32.app.impl.hpp"
 #include "wv2.scheme.impl.hpp"
 
+#include <GdiplusColor.h>
 #include <cassert>
 
 #include <rebind/utils/enum.hpp>
@@ -18,6 +19,7 @@
 
 #include <shlwapi.h>
 #include <WebView2EnvironmentOptions.h>
+#include <winuser.h>
 
 namespace saucer
 {
@@ -273,13 +275,35 @@ namespace saucer
             break;
         case WM_NCHITTEST: {
 
-            // POINT pt = {GET_X_LPARAM(l_param), GET_Y_LPARAM(l_param)};
-            // ScreenToClient(hwnd, &pt);
+            POINT pt = {GET_X_LPARAM(l_param), GET_Y_LPARAM(l_param)};
+            ScreenToClient(hwnd, &pt);
 
             // Check if the point is over a non-transparent element in WebView2
             // BOOL isTransparent = TRUE;
+            RECT rect;
+            GetClientRect(hwnd, &rect);
+            int w = rect.right - rect.left;
+            int h = rect.bottom - rect.top;
+            if (pt.x < (w / 2))
+            {
+                return HTTRANSPARENT;
+            }
+            return HTCLIENT;
+        }
+        case WM_LBUTTONDOWN: {
+            CPoint pt;
+            pt.x = GET_X_LPARAM(lParam);
+            pt.y = GET_Y_LPARAM(lParam);
 
-            return HTTRANSPARENT;
+            impl->OnLButtonDown(hwnd, pt);
+        }
+        case WM_MOUSEMOVE: {
+            CPoint pt;
+            pt.x                = GET_X_LPARAM(lParam);
+            pt.y                = GET_Y_LPARAM(lParam);
+            bool isMousePressed = lParam & MK_LBUTTON;
+            CEditWnd &wnd       = CEditWnd::GetInstance();
+            wnd.OnMouseMove(pt, isMousePressed);
         }
         case WM_PAINT: {
 
@@ -290,7 +314,7 @@ namespace saucer
             // BOOL isTransparent = TRUE;
             PAINTSTRUCT ps;
             HDC hdc = BeginPaint(hwnd, &ps);
-            OnPaint(hwnd, hdc);
+            impl->OnPaint(hwnd, hdc);
             EndPaint(hwnd, &ps);
         }
         }
@@ -310,9 +334,13 @@ namespace saucer
 
         // draw
         Gdiplus::Graphics graphics(hMemDC);
-
+        auto color = Gdiplus::Color(0xff00ff00);
+        if (isDragging)
+        {
+            color = Gdiplus::Color(0xffff0000);
+        }
         Gdiplus::SolidBrush brush(Gdiplus::Color(0xff00ff00));
-        graphics.FillRectangle(&brush, 0, h/2, w, h/2);
+        graphics.FillRectangle(&brush, 0, h / 2, w, h / 2);
         // alpha
         POINT ptSrc    = {0, 0};
         SIZE szLayered = {w, h};
@@ -328,7 +356,52 @@ namespace saucer
         DeleteObject(hMemBitmap);
         DeleteDC(hMemDC);
     }
+    void webview::impl::OnLButtonDown(HWND hwnd, POINT pt)
+    {
+        GetClientRect(hwnd, &rect);
+        int w = rect.right - rect.left;
+        int h = rect.bottom - rect.top;
+        if (pt.x < w / 2)
+        {
+            isDragging = true;
+            SetCapture(m_hWnd);
+        }
+    }
+    void webview::impl::OnLButtonUp(HWND hwnd, POINT pt)
+    {
+        isDragging = false;
+    }
+    void webview::impl::OnMouseMove(HWND hwnd, POINT pt)
+    {
+        TRACKMOUSEEVENT tme;
+        tme.cbSize    = sizeof(TRACKMOUSEEVENT);
+        tme.dwFlags   = TME_LEAVE;
+        tme.hwndTrack = hwnd;
+        ::_TrackMouseEvent(&tme);
 
+        if (isDragging)
+        {
+            GetCursorPos(&cursorNow);
+            int dx         = (cursorNow.x - cursorPrevious.x);
+            int dy         = (cursorNow.y - cursorPrevious.y);
+            cursorPrevious = cursorNow;
+            RECT rect;
+            GetWindowRect(m_impl->hwnd.get(), &rect);
+
+            int xNext = rect.left += dx;
+            int yNext = rect.top += dy;
+            SetWindowPos(hwnd, NULL, xNext, xNext, 0, 0, SWP_NOSIZE | SWP_NOZORDER);
+            return;
+        }
+    }
+    void webview::impl::OnMouseEnter(HWND hwnd, POINT pt)
+    {
+        isDragging = false;
+    }
+    void webview::impl::OnMouseLeave(HWND hwnd, POINT pt)
+    {
+        isDragging = false;
+    }
     template <>
     void webview::impl::setup<web_event::dom_ready>(webview *)
     {
