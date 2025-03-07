@@ -375,11 +375,11 @@ namespace saucer
     }
     void webview::impl::on_mouse_move(HWND hwnd, POINT, bool)
     {
-        TRACKMOUSEEVENT tme;
-        tme.cbSize    = sizeof(TRACKMOUSEEVENT);
-        tme.dwFlags   = TME_LEAVE;
-        tme.hwndTrack = hwnd;
-        _TrackMouseEvent(&tme);
+        // TRACKMOUSEEVENT tme;
+        // tme.cbSize    = sizeof(TRACKMOUSEEVENT);
+        // tme.dwFlags   = TME_LEAVE;
+        // tme.hwndTrack = hwnd;
+        // _TrackMouseEvent(&tme);
 
         if (isDragging)
         {
