@@ -259,6 +259,11 @@ namespace saucer
         // tme.dwFlags   = TME_LEAVE;
         // tme.hwndTrack = hwnd;
         // _TrackMouseEvent(&tme);
+        TRACKMOUSEEVENT tme;
+        tme.cbSize = sizeof(TRACKMOUSEEVENT);
+        tme.dwFlags = TME_LEAVE;
+        tme.hwndTrack = hwnd;
+        TrackMouseEvent(&tme);
 
         if (isDragging)
         {
