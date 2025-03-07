@@ -137,23 +137,24 @@ namespace saucer
 
             return 0;
         }
-        // case WM_PAINT: {
+        case WM_PAINT: {
 
-        //     // POINT pt = {GET_X_LPARAM(l_param), GET_Y_LPARAM(l_param)};
-        //     // ScreenToClient(hwnd, &pt);
+            // POINT pt = {GET_X_LPARAM(l_param), GET_Y_LPARAM(l_param)};
+            // ScreenToClient(hwnd, &pt);
 
-        //     // // Check if the point is over a non-transparent element in WebView2
-        //     // BOOL isTransparent = TRUE;
-        //     PAINTSTRUCT ps;
-        //     HDC hdc = BeginPaint(hwnd, &ps);
-        //     OnPaint(hwnd, hdc);
-        //     EndPaint(hwnd, &ps);
-        // }
+            // // Check if the point is over a non-transparent element in WebView2
+            // BOOL isTransparent = TRUE;
+            PAINTSTRUCT ps;
+            HDC hdc = BeginPaint(hwnd, &ps);
+            window->m_impl->on_paint(hwnd, hdc);
+            // OnPaint(hwnd, hdc);
+            EndPaint(hwnd, &ps);
+        }
         }
 
         return CallWindowProcW(impl->o_wnd_proc, hwnd, msg, w_param, l_param);
     }
-    void window::impl::OnPaint(HWND hwnd, HDC hdc)
+    void window::impl::on_paint(HWND hwnd, HDC hdc)
     {
         // create mem dc
         RECT rect;
@@ -168,7 +169,7 @@ namespace saucer
         Gdiplus::Graphics graphics(hMemDC);
 
         Gdiplus::SolidBrush brush(Gdiplus::Color(0xffff0000));
-        graphics.FillRectangle(&brush, w/2, 0, w/2, h);
+        graphics.FillRectangle(&brush, w / 2, 0, w / 2, h);
         // alpha
         POINT ptSrc    = {0, 0};
         SIZE szLayered = {w, h};

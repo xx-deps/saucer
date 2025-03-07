@@ -33,6 +33,8 @@ namespace saucer
       public:
         static void set_style(HWND, long);
         static LRESULT CALLBACK wnd_proc(HWND, UINT, WPARAM, LPARAM);
-        static void OnPaint(HWND hwnd, HDC hdc);
+
+      public:
+        void on_paint(HWND hwnd, HDC hdc);
     };
 } // namespace saucer

@@ -1,7 +1,7 @@
 #pragma once
 
 #include "webview.hpp"
-
+#include <windows.h>
 #include <windef.h>
 #include <wrl.h>
 #include <WebView2.h>
@@ -64,16 +64,17 @@ namespace saucer
       public:
         WNDPROC o_wnd_proc;
         static LRESULT CALLBACK wnd_proc(HWND, UINT, WPARAM, LPARAM);
-        void OnPaint(HWND hwnd, HDC hdc);
-        void OnLButtonDown(HWND hwnd, POINT pt);
-        void OnLButtonUp(HWND hwnd, POINT pt);
-        void OnMouseMove(HWND hwnd, POINT pt);
-        void OnMouseEnter(HWND hwnd, POINT pt);
-        void OnMouseLeave(HWND hwnd, POINT pt);
+        void on_paint(HWND hwnd, HDC hdc);
+        void on_mouse_down_left(HWND hwnd, POINT pt);
+        void on_mouse_button_left(HWND hwnd, POINT pt);
+        void on_mouse_move(HWND hwnd, POINT pt, bool pressed);
+        void on_mouse_enter(HWND hwnd, POINT pt);
+        void on_mouse_leave(HWND hwnd, POINT pt);
+
       private:
-        bool isDragging = false;
-        POINT cursorPrevious = {0, 0};
-        POINT cursorNow = {0, 0};
+        bool isDragging        = false;
+        POINT cursorPrevious   = {0, 0};
+        POINT cursorNow        = {0, 0};
         POINT windowPostionNow = {0, 0};
     };
 } // namespace saucer
