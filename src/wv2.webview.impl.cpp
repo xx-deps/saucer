@@ -379,7 +379,7 @@ namespace saucer
         tme.cbSize    = sizeof(TRACKMOUSEEVENT);
         tme.dwFlags   = TME_LEAVE;
         tme.hwndTrack = hwnd;
-        ::_TrackMouseEvent(&tme);
+        _TrackMouseEvent(&tme);
 
         if (isDragging)
         {
