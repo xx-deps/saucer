@@ -163,7 +163,7 @@ namespace saucer
             std::cout << "WM_PAINT" << std::endl;
             PAINTSTRUCT ps;
             HDC hdc = BeginPaint(hwnd, &ps);
-            window->m_impl->on_paint(hwnd, hdc);
+            impl->on_paint(hwnd, hdc);
 
             EndPaint(hwnd, &ps);
         }
@@ -172,21 +172,21 @@ namespace saucer
             pt.x = GET_X_LPARAM(l_param);
             pt.y = GET_Y_LPARAM(l_param);
             std::cout << "WM_LBUTTONDOWN" << pt.x << "," << pt.y << std::endl;
-            window->m_impl->on_mouse_down_left(hwnd, pt);
+            impl->on_mouse_down_left(hwnd, pt);
         }
         case WM_LBUTTONUP: {
             POINT pt;
             pt.x = GET_X_LPARAM(l_param);
             pt.y = GET_Y_LPARAM(l_param);
             std::cout << "WM_LBUTTONUP" << pt.x << "," << pt.y << std::endl;
-            window->m_impl->on_mouse_up_left(hwnd, pt);
+            impl->on_mouse_up_left(hwnd, pt);
         }
         case WM_MOUSELEAVE: {
             POINT pt;
             pt.x = GET_X_LPARAM(l_param);
             pt.y = GET_Y_LPARAM(l_param);
             std::cout << "WM_MOUSELEAVE" << pt.x << "," << pt.y << std::endl;
-            window->m_impl->on_mouse_leave(hwnd, pt);
+            impl->on_mouse_leave(hwnd, pt);
         }
         case WM_MOUSEMOVE: {
             POINT pt;
@@ -194,7 +194,7 @@ namespace saucer
             pt.y                = GET_Y_LPARAM(l_param);
             bool isMousePressed = l_param & MK_LBUTTON;
             std::cout << "WM_MOUSEMOVE" << pt.x << "," << pt.y << std::endl;
-            window->m_impl->on_mouse_move(hwnd, pt, isMousePressed);
+            impl->on_mouse_move(hwnd, pt, isMousePressed);
         }
         }
 
@@ -278,11 +278,11 @@ namespace saucer
 
     void window::impl::on_mouse_enter(HWND, POINT)
     {
-        isDragging = false;
+        // isDragging = false;
     }
 
     void window::impl::on_mouse_leave(HWND, POINT)
     {
-        isDragging = false;
+        // isDragging = false;
     }
 } // namespace saucer

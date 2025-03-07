@@ -8,6 +8,7 @@
 #include "win32.window.impl.hpp"
 #include "wv2.navigation.impl.hpp"
 
+#include <iostream>
 #include <ranges>
 #include <cassert>
 #include <filesystem>
@@ -27,6 +28,7 @@ namespace saucer
 
         m_impl->o_wnd_proc = utils::overwrite_wndproc(window::m_impl->hwnd.get(), impl::wnd_proc);
         m_impl->create_webview(m_parent, window::m_impl->hwnd.get(), prefs);
+        std::cout << "create_webview" << std::endl;
 
         m_impl->web_view->get_Settings(&m_impl->settings);
         m_impl->settings->put_IsStatusBarEnabled(false);
