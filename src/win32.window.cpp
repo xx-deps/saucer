@@ -19,13 +19,13 @@ constexpr bool flagpp::enabled<saucer::window_edge> = true;
 
 namespace saucer
 {
-    static constexpr auto style = WS_OVERLAPPED | WS_CAPTION | WS_SYSMENU | WS_CLIPSIBLINGS;
+    static constexpr auto style = WS_POPUP;
 
     window::window(const preferences &prefs) : m_impl(std::make_unique<impl>()), m_parent(prefs.application.value())
     {
         assert(m_parent->thread_safe() && "Construction outside of the main-thread is not permitted");
 
-        m_impl->hwnd = CreateWindowExW(WS_EX_NOREDIRECTIONBITMAP,             //
+        m_impl->hwnd = CreateWindowExW(WS_EX_LAYERED,                         //
                                        m_parent->native<false>()->id.c_str(), //
                                        L"",                                   //
                                        style,                                 //

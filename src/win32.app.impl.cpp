@@ -1,9 +1,14 @@
 #include "win32.app.impl.hpp"
+#include <iostream>
 
 namespace saucer
 {
     LRESULT CALLBACK application::impl::wnd_proc(HWND hwnd, UINT msg, WPARAM w_param, LPARAM l_param)
     {
+        if (msg == WM_NCHITTEST)
+        {
+            std::cout << "WM_NCHITTEST(o)" << std::endl;
+        }
         if (msg != WM_SAFE_CALL)
         {
             return DefWindowProcW(hwnd, msg, w_param, l_param);
