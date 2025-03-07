@@ -407,6 +407,34 @@ namespace saucer
         SetWindowLongPtrW(m_impl->hwnd.get(), GWL_EXSTYLE, current);
     }
 
+    void window::set_clickable(bool enabled)
+    {
+        if (!m_parent->thread_safe())
+        {
+            return m_parent->dispatch([this, enabled] { set_clickable(enabled); });
+        }
+
+        static constexpr auto flags = WS_EX_TRANSPARENT;
+        auto current                = GetWindowLongPtr(m_impl->hwnd.get(), GWL_EXSTYLE);
+
+        if (enabled)
+        {
+            current |= flags;
+        }
+        else
+        {
+            current &= ~flags;
+        }
+        current |= WS_EX_LAYERED;
+        SetWindowLongPtrW(m_impl->hwnd.get(), GWL_EXSTYLE, current);
+
+        SetLayeredWindowAttributes(m_impl->hwnd.get(), RGB(255, 255, 255), 255, 0);
+        if (!enabled)
+        {
+            return;
+        }
+
+    }
     void window::set_click_through(bool enabled)
     {
         if (!m_parent->thread_safe())

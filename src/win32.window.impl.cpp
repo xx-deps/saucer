@@ -1,6 +1,7 @@
 #include "win32.window.impl.hpp"
 
 #include "win32.app.impl.hpp"
+#include <windowsx.h>
 
 namespace saucer
 {
@@ -147,8 +148,22 @@ namespace saucer
             PAINTSTRUCT ps;
             HDC hdc = BeginPaint(hwnd, &ps);
             window->m_impl->on_paint(hwnd, hdc);
-            // OnPaint(hwnd, hdc);
+
             EndPaint(hwnd, &ps);
+        }
+        case WM_LBUTTONDOWN: {
+            POINT pt;
+            pt.x = GET_X_LPARAM(l_param);
+            pt.y = GET_Y_LPARAM(l_param);
+
+            window->m_impl->on_mouse_down_left(hwnd, pt);
+        }
+        case WM_MOUSEMOVE: {
+            POINT pt;
+            pt.x                = GET_X_LPARAM(l_param);
+            pt.y                = GET_Y_LPARAM(l_param);
+            bool isMousePressed = l_param & MK_LBUTTON;
+            window->m_impl->on_mouse_move(hwnd, pt, isMousePressed);
         }
         }
 
@@ -167,9 +182,13 @@ namespace saucer
 
         // draw
         Gdiplus::Graphics graphics(hMemDC);
-
-        Gdiplus::SolidBrush brush(Gdiplus::Color(0xffff0000));
-        graphics.FillRectangle(&brush, w / 2, 0, w / 2, h);
+        auto color = Gdiplus::Color(0xffff0000);
+        if (isDragging)
+        {
+            color = Gdiplus::Color(0xff00ff00);
+        }
+        Gdiplus::SolidBrush brush(color);
+        graphics.FillRectangle(&brush, w / 3 * 2, 0, w / 3, h);
         // alpha
         POINT ptSrc    = {0, 0};
         SIZE szLayered = {w, h};
@@ -184,5 +203,55 @@ namespace saucer
         SelectObject(hMemDC, oldBM);
         DeleteObject(hMemBitmap);
         DeleteDC(hMemDC);
+    }
+    void window::impl::on_mouse_down_left(HWND hwnd, POINT pt)
+    {
+        RECT rect;
+        GetClientRect(hwnd, &rect);
+        int w = rect.right - rect.left;
+        // int h = rect.bottom - rect.top;
+        if (pt.x < w / 2)
+        {
+        }
+
+        isDragging = true;
+        SetCapture(hwnd);
+    }
+    void window::impl::on_mouse_button_left(HWND, POINT)
+    {
+        isDragging = false;
+    }
+    void window::impl::on_mouse_move(HWND hwnd, POINT, bool)
+    {
+        // TRACKMOUSEEVENT tme;
+        // tme.cbSize    = sizeof(TRACKMOUSEEVENT);
+        // tme.dwFlags   = TME_LEAVE;
+        // tme.hwndTrack = hwnd;
+        // _TrackMouseEvent(&tme);
+
+        if (isDragging)
+        {
+            GetCursorPos(&cursorNow);
+            int dx         = (cursorNow.x - cursorPrevious.x);
+            int dy         = (cursorNow.y - cursorPrevious.y);
+            cursorPrevious = cursorNow;
+            RECT rect;
+            GetWindowRect(hwnd, &rect);
+
+            int xNext = rect.left += dx;
+            int yNext = rect.top += dy;
+            SetWindowPos(hwnd, nullptr, xNext, yNext, 0, 0, SWP_NOSIZE | SWP_NOZORDER);
+            return;
+        }
+    }
+
+    void window::impl::on_mouse_enter(HWND, POINT)
+    {
+        isDragging = false;
+    }
+
+    void window::impl::on_mouse_leave(HWND, POINT)
+    {
+        isDragging = false;
     }
 } // namespace saucer

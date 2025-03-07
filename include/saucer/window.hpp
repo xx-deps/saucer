@@ -148,6 +148,7 @@ namespace saucer
       public:
         [[sc::thread_safe]] void set_always_on_top(bool enabled);
         [[sc::thread_safe]] void set_click_through(bool enabled);
+        [[sc::thread_safe]] void set_clickable(bool enabled);
         [[sc::thread_safe]] void set_skip_taskbar(bool enabled);
         
       public:

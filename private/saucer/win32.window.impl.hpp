@@ -36,5 +36,16 @@ namespace saucer
 
       public:
         void on_paint(HWND hwnd, HDC hdc);
+        void on_mouse_down_left(HWND hwnd, POINT pt);
+        void on_mouse_button_left(HWND hwnd, POINT pt);
+        void on_mouse_move(HWND hwnd, POINT pt, bool pressed);
+        void on_mouse_enter(HWND hwnd, POINT pt);
+        void on_mouse_leave(HWND hwnd, POINT pt);
+
+      private:
+        bool isDragging        = false;
+        POINT cursorPrevious   = {0, 0};
+        POINT cursorNow        = {0, 0};
+        POINT windowPostionNow = {0, 0};
     };
 } // namespace saucer

@@ -292,20 +292,7 @@ namespace saucer
         //     }
         //     return HTCLIENT;
         // }
-        case WM_LBUTTONDOWN: {
-            POINT pt;
-            pt.x = GET_X_LPARAM(l_param);
-            pt.y = GET_Y_LPARAM(l_param);
-
-            impl->on_mouse_down_left(hwnd, pt);
-        }
-        case WM_MOUSEMOVE: {
-            POINT pt;
-            pt.x                = GET_X_LPARAM(l_param);
-            pt.y                = GET_Y_LPARAM(l_param);
-            bool isMousePressed = l_param & MK_LBUTTON;
-            impl->on_mouse_move(hwnd, pt, isMousePressed);
-        }
+        
         case WM_PAINT: {
 
             // POINT pt = {GET_X_LPARAM(l_param), GET_Y_LPARAM(l_param)};
@@ -336,11 +323,8 @@ namespace saucer
         // draw
         Gdiplus::Graphics graphics(hMemDC);
         auto color = Gdiplus::Color(0xff00ff00);
-        if (isDragging)
-        {
-            color = Gdiplus::Color(0xffff0000);
-        }
-        Gdiplus::SolidBrush brush(Gdiplus::Color(0xff00ff00));
+       
+        Gdiplus::SolidBrush brush(color);
         graphics.FillRectangle(&brush, 0, h / 2, w, h / 2);
         // alpha
         POINT ptSrc    = {0, 0};
@@ -357,55 +341,7 @@ namespace saucer
         DeleteObject(hMemBitmap);
         DeleteDC(hMemDC);
     }
-    void webview::impl::on_mouse_down_left(HWND hwnd, POINT pt)
-    {
-        RECT rect;
-        GetClientRect(hwnd, &rect);
-        int w = rect.right - rect.left;
-        // int h = rect.bottom - rect.top;
-        if (pt.x < w / 2)
-        {
-        }
-        isDragging = true;
-        SetCapture(hwnd);
-    }
-    void webview::impl::on_mouse_button_left(HWND, POINT)
-    {
-        isDragging = false;
-    }
-    void webview::impl::on_mouse_move(HWND hwnd, POINT, bool)
-    {
-        // TRACKMOUSEEVENT tme;
-        // tme.cbSize    = sizeof(TRACKMOUSEEVENT);
-        // tme.dwFlags   = TME_LEAVE;
-        // tme.hwndTrack = hwnd;
-        // _TrackMouseEvent(&tme);
-
-        if (isDragging)
-        {
-            GetCursorPos(&cursorNow);
-            int dx         = (cursorNow.x - cursorPrevious.x);
-            int dy         = (cursorNow.y - cursorPrevious.y);
-            cursorPrevious = cursorNow;
-            RECT rect;
-            GetWindowRect(hwnd, &rect);
-
-            int xNext = rect.left += dx;
-            int yNext = rect.top += dy;
-            SetWindowPos(hwnd, nullptr, xNext, yNext, 0, 0, SWP_NOSIZE | SWP_NOZORDER);
-            return;
-        }
-    }
-
-    void webview::impl::on_mouse_enter(HWND, POINT)
-    {
-        isDragging = false;
-    }
-
-    void webview::impl::on_mouse_leave(HWND, POINT)
-    {
-        isDragging = false;
-    }
+    
 
     template <>
     void webview::impl::setup<web_event::dom_ready>(webview *)
