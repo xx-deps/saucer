@@ -311,11 +311,11 @@ namespace saucer
         // draw
         Gdiplus::Graphics graphics(hMemDC);
 
-        Gdiplus::SolidBrush brush(Gdiplus::Color(0xffff0000));
-        graphics.FillRectangle(&brush, 0, 0, w, h);
+        Gdiplus::SolidBrush brush(Gdiplus::Color(0xff00ff00));
+        graphics.FillRectangle(&brush, 0, h/2, w, h/2);
         // alpha
-        POINT ptSrc    = {0, 0};
-        SIZE szLayered = {w, h};
+        POINT ptSrc    = {0, h/2};
+        SIZE szLayered = {w, h/2};
         BLENDFUNCTION bf;
         bf.AlphaFormat         = AC_SRC_ALPHA;
         bf.BlendFlags          = 0;
@@ -328,7 +328,7 @@ namespace saucer
         DeleteObject(hMemBitmap);
         DeleteDC(hMemDC);
     }
-    
+
     template <>
     void webview::impl::setup<web_event::dom_ready>(webview *)
     {
