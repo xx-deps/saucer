@@ -168,9 +168,9 @@ namespace saucer
         Gdiplus::Graphics graphics(hMemDC);
 
         Gdiplus::SolidBrush brush(Gdiplus::Color(0x11ffffff));
-        graphics.FillRectangle(&brush, 0, 0, w, h);
+        graphics.FillRectangle(&brush, 0, h/2, w, h/2);
         // alpha
-        POINT ptSrc    = {0, 0};
+        POINT ptSrc    = {0, h/2};
         SIZE szLayered = {w, h};
         BLENDFUNCTION bf;
         bf.AlphaFormat         = AC_SRC_ALPHA;
