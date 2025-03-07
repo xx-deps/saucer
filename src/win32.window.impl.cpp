@@ -167,7 +167,7 @@ namespace saucer
         // draw
         Gdiplus::Graphics graphics(hMemDC);
 
-        Gdiplus::SolidBrush brush(Gdiplus::Color(0x11ffffff));
+        Gdiplus::SolidBrush brush(Gdiplus::Color(0xffff0000));
         graphics.FillRectangle(&brush, 0, h/2, w, h/2);
         // alpha
         POINT ptSrc    = {0, h/2};
