@@ -170,7 +170,7 @@ namespace saucer
         Gdiplus::SolidBrush brush(Gdiplus::Color(0xffff0000));
         graphics.FillRectangle(&brush, w/2, 0, w/2, h);
         // alpha
-        POINT ptSrc    = {w/2, 0};
+        POINT ptSrc    = {0, 0};
         SIZE szLayered = {w, h};
         BLENDFUNCTION bf;
         bf.AlphaFormat         = AC_SRC_ALPHA;
