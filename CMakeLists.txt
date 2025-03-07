@@ -9,7 +9,7 @@ option(saucer_static            "Build a static library"                        
 option(saucer_modules           "Enable module support"                             ON)
 
 option(saucer_package_all       "Add all required dependencies to install target"  OFF)
-option(saucer_prefer_remote     "Prefer remote packages over local packages"        OFF)
+option(saucer_prefer_remote     "Prefer remote packages over local packages"        ON)
 
 option(saucer_examples          "Build examples"                                   OFF)
 option(saucer_tests             "Build tests"                                      OFF)
