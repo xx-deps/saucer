@@ -407,11 +407,11 @@ namespace saucer
         SetWindowLongPtrW(m_impl->hwnd.get(), GWL_EXSTYLE, current);
     }
 
-    void window::set_clickable(bool enabled)
+    void window::set_non_clickable(bool enabled)
     {
         if (!m_parent->thread_safe())
         {
-            m_parent->dispatch([this, enabled] { set_clickable(enabled); });
+            m_parent->dispatch([this, enabled] { set_non_clickable(enabled); });
             return;
         }
 
