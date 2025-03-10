@@ -34,14 +34,6 @@ namespace saucer
         static void set_style(HWND, long);
         static LRESULT CALLBACK wnd_proc(HWND, UINT, WPARAM, LPARAM);
 
-      public:
-        void on_paint(HWND hwnd, HDC hdc);
-        void on_mouse_down_left(HWND hwnd, POINT pt);
-        void on_mouse_up_left(HWND hwnd, POINT pt);
-        void on_mouse_move(HWND hwnd, POINT pt, bool pressed);
-        void on_mouse_enter(HWND hwnd, POINT pt);
-        void on_mouse_leave(HWND hwnd, POINT pt);
-
       private:
         bool isDragging        = false;
         POINT cursorPrevious   = {0, 0};
