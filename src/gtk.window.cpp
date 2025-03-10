@@ -170,6 +170,37 @@ namespace saucer
         return {width, height};
     }
 
+    std::pair<int, int> window::position() const // NOLINT(*-static)
+    {
+        return {};
+    }
+
+    std::optional<saucer::screen> window::screen() const
+    {
+        if (!m_parent->thread_safe())
+        {
+            return m_parent->dispatch([this] { return screen(); });
+        }
+
+        auto *const native  = gtk_widget_get_native(GTK_WIDGET(m_impl->window.get()));
+        auto *const surface = gtk_native_get_surface(native);
+
+        if (!surface)
+        {
+            return std::nullopt;
+        }
+
+        auto *const display = gdk_display_get_default();
+        auto *const monitor = gdk_display_get_monitor_at_surface(display, surface);
+
+        if (!monitor)
+        {
+            return std::nullopt;
+        }
+
+        return application::impl::convert(monitor);
+    }
+
     void window::hide()
     {
         if (!m_parent->thread_safe())
@@ -365,6 +396,10 @@ namespace saucer
         }
 
         gtk_widget_set_size_request(GTK_WIDGET(m_impl->window.get()), width, height);
+    }
+
+    void window::set_position(int, int) // NOLINT(*-static)
+    {
     }
 
     void window::clear(window_event event)

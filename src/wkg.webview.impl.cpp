@@ -1,6 +1,7 @@
 #include "wkg.webview.impl.hpp"
 
 #include "scripts.hpp"
+#include "request.hpp"
 
 #include "wkg.scheme.impl.hpp"
 #include "wkg.navigation.impl.hpp"
@@ -105,26 +106,24 @@ namespace saucer
     {
     }
 
-    const std::string &webview::impl::inject_script()
+    std::string webview::impl::inject_script()
     {
-        static std::optional<std::string> instance;
+        static constexpr auto internal = R"js(
+            message: async (message) =>
+            {
+                window.webkit.messageHandlers.saucer.postMessage(message);
+            }
+        )js";
 
-        if (instance)
-        {
-            return instance.value();
-        }
+        static const auto script = fmt::format(scripts::webview_script,            //
+                                               fmt::arg("internal", internal),     //
+                                               fmt::arg("stubs", request::stubs()) //
+        );
 
-        instance.emplace(fmt::format(scripts::webview_script, fmt::arg("internal", R"js(
-        send_message: async (message) =>
-        {
-            window.webkit.messageHandlers.saucer.postMessage(message);
-        }
-        )js")));
-
-        return instance.value();
+        return script;
     }
 
-    constinit std::string_view webview::impl::ready_script = "window.saucer.internal.send_message('dom_loaded')";
+    constinit std::string_view webview::impl::ready_script = "window.saucer.internal.message('dom_loaded')";
 
     std::optional<GValue> convert(std::string_view value)
     {

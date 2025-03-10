@@ -1,6 +1,7 @@
 #include "wv2.webview.impl.hpp"
 
 #include "scripts.hpp"
+#include "request.hpp"
 
 #include "win32.utils.hpp"
 #include "win32.app.impl.hpp"
@@ -26,23 +27,21 @@
 
 namespace saucer
 {
-    const std::string &webview::impl::inject_script()
+    std::string webview::impl::inject_script()
     {
-        static std::optional<std::string> instance;
+        static constexpr auto internal = R"js(
+            message: async (message) =>
+            {
+                window.chrome.webview.postMessage(message);
+            }
+        )js";
 
-        if (instance)
-        {
-            return instance.value();
-        }
+        static const auto script = fmt::format(scripts::webview_script,            //
+                                               fmt::arg("internal", internal),     //
+                                               fmt::arg("stubs", request::stubs()) //
+        );
 
-        instance.emplace(fmt::format(scripts::webview_script, fmt::arg("internal", R"js(
-        send_message: async (message) =>
-        {
-            window.chrome.webview.postMessage(message);
-        }
-        )js")));
-
-        return instance.value();
+        return script;
     }
 
     ComPtr<CoreWebView2EnvironmentOptions> webview::impl::env_options()

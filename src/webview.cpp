@@ -1,6 +1,5 @@
 #include "webview.hpp"
-
-#include "requests.hpp"
+#include "request.hpp"
 
 #include <algorithm>
 
@@ -15,28 +14,46 @@ namespace saucer
             return true;
         }
 
-        auto request = requests::parse(message);
+        auto request = request::parse(message);
 
         if (!request)
         {
             return false;
         }
 
-        if (std::holds_alternative<requests::resize>(request.value()))
-        {
-            const auto data = std::get<requests::resize>(request.value());
-            start_resize(static_cast<window_edge>(data.edge));
+        overload visitor = {
+            [this](const request::start_resize &data) { start_resize(static_cast<window_edge>(data.edge)); },
+            [this](const request::start_drag &) { start_drag(); },
+            [this](const request::maximize &data) { set_maximized(data.value); },
+            [this](const request::minimize &data) { set_minimized(data.value); },
+            [this](const request::close &) { close(); },
+            [this](const request::maximized &data) { resolve(data.id, fmt::format("{}", maximized())); },
+            [this](const request::minimized &data) { resolve(data.id, fmt::format("{}", minimized())); },
+        };
 
-            return true;
-        }
+        std::visit(visitor, request.value());
 
-        if (std::holds_alternative<requests::drag>(request.value()))
-        {
-            start_drag();
-            return true;
-        }
+        return true;
+    }
 
-        return false;
+    void webview::reject(std::uint64_t id, const std::string &reason)
+    {
+        execute(fmt::format(
+            R"(
+                window.saucer.internal.rpc[{0}].reject({1});
+                delete window.saucer.internal.rpc[{0}];
+            )",
+            id, reason));
+    }
+
+    void webview::resolve(std::uint64_t id, const std::string &result)
+    {
+        execute(fmt::format(
+            R"(
+                window.saucer.internal.rpc[{0}].resolve({1});
+                delete window.saucer.internal.rpc[{0}];
+            )",
+            id, result));
     }
 
     void webview::embed(embedded_files files, launch policy)

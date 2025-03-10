@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.25)
-project(saucer LANGUAGES CXX VERSION 6.0.1)
+project(saucer LANGUAGES CXX VERSION 7.0.0)
 
 # --------------------------------------------------------------------------------------------------------
 # Library switches
@@ -59,6 +59,7 @@ endif()
 # --------------------------------------------------------------------------------------------------------
 
 set(saucer_webview2_version "1.0.2903.40"   CACHE STRING "The WebView2 version to use (Ignored when using offline packages)")
+set(saucer_windows_arch     "Default"       CACHE STRING "The windows architecture (Win32, x64, ARM64) used for linking against NuGet packages")
 set(saucer_backend          "Default"       CACHE STRING "The backend to use, will use the most appropiate one for the current platform by default")
 set(saucer_serializer       "Glaze"         CACHE STRING "The built-in serializer to use for e.g. request parsing. Also used as the default smartview serializer")
 set(saucer_polyfills        "Default"       CACHE STRING "The polyfills to use. Set to 'None' to avoid any polyfills from being used. Uses 'try_compile' by default")
@@ -217,6 +218,7 @@ endif()
 # --------------------------------------------------------------------------------------------------------
 
 target_sources(${PROJECT_NAME} PRIVATE 
+    "src/request.cpp"
     "src/module/unstable.cpp"
     
     "src/app.cpp"
@@ -309,7 +311,7 @@ CPMFindPackage(
 
 CPMFindPackage(
   NAME           fmt
-  GIT_TAG        11.1.1
+  GIT_TAG        11.1.4
   GIT_REPOSITORY "https://github.com/fmtlib/fmt"
 )
 
@@ -321,7 +323,7 @@ CPMFindPackage(
 
 CPMFindPackage(
   NAME           rebind
-  VERSION        5.1.1
+  VERSION        5.2.1
   GIT_REPOSITORY "https://github.com/Curve/rebind"
 )
 
@@ -424,7 +426,7 @@ if (saucer_serializer STREQUAL "Glaze")
 
   CPMFindPackage(
     NAME           glaze
-    VERSION        4.2.4
+    VERSION        4.4.2
     GIT_REPOSITORY "https://github.com/stephenberry/glaze"
   )
 
@@ -440,7 +442,7 @@ if (saucer_serializer STREQUAL "Rflpp")
 
   CPMFindPackage(
     NAME           reflectcpp
-    VERSION        0.16.0
+    VERSION        0.17.0
     GIT_REPOSITORY "https://github.com/getml/reflect-cpp"
     SYSTEM         ON
   )

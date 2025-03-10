@@ -15,52 +15,88 @@ namespace saucer::traits
 {
     namespace impl
     {
-        template <typename T, typename... Ts>
-        consteval auto apply_result(const std::tuple<Ts...> &) -> std::invoke_result_t<T, Ts...>;
+        template <bool Success, typename T = void>
+        struct apply_info
+        {
+            using type                    = T;
+            static constexpr auto success = Success;
+        };
+
+        template <typename T, typename Args>
+        struct apply
+        {
+            using type = apply_info<false>;
+        };
 
         template <typename T, typename... Ts>
-        consteval auto can_apply(const std::tuple<Ts...> &) -> std::bool_constant<std::invocable<T, Ts...>>;
+            requires std::invocable<T, Ts...>
+        struct apply<T, std::tuple<Ts...>>
+        {
+            using type = apply_info<true, std::invoke_result_t<T, Ts...>>;
+        };
+
+        template <typename T>
+        struct has_reference : std::false_type
+        {
+        };
+
+        template <typename... Ts>
+            requires((std::is_lvalue_reference_v<Ts> && !std::is_const_v<std::remove_reference_t<Ts>>) || ...)
+        struct has_reference<std::tuple<Ts...>> : std::true_type
+        {
+        };
 
         template <typename T, typename D = std::decay_t<T>>
         using arg_transformer_t = std::conditional_t<std::same_as<D, std::string_view>, std::string, D>;
     } // namespace impl
 
-    template <typename T, typename Args>
-    using apply_result_t = decltype(impl::apply_result<T>(std::declval<Args>()));
+    using apply_failure = impl::apply_info<false>;
+
+    template <typename T>
+    using apply_success = impl::apply_info<true, T>;
 
     template <typename T, typename Args>
-    static constexpr auto can_apply_v = decltype(impl::can_apply<T>(std::declval<Args>()))::value;
+    using apply_t = impl::apply<T, Args>::type;
+
+    template <typename T>
+    static constexpr auto has_reference_v = impl::has_reference<T>::value;
+
+    template <typename T>
+    using raw_args_t = boost::callable_traits::args_t<T>;
 
     template <typename T, template <typename...> typename Transform = impl::arg_transformer_t>
-    using args_t = tuple::transform_t<boost::callable_traits::args_t<T>, Transform>;
+    using args_t = tuple::transform_t<raw_args_t<T>, Transform>;
 
     template <typename T>
     using result_t = boost::callable_traits::return_type_t<T>;
 
-    template <typename T,                                                                                                //
-              typename Executor,                                                                                         //
-              typename Args,                                                                                             //
-              bool TakesExecutor = can_apply_v<T, tuple::add_t<Args, Executor>>,                                         //
-              typename Result = apply_result_t<T, std::conditional_t<TakesExecutor, tuple::add_t<Args, Executor>, Args>> //
+    template <typename T,                                                                                                 //
+              typename Args,                                                                                              //
+              typename Executor,                                                                                          //
+              typename WithExecutor = apply_t<T, tuple::add_t<Args, Executor>>,                                           //
+              typename Result = apply_t<T, std::conditional_t<WithExecutor::success, tuple::add_t<Args, Executor>, Args>> //
               >
-    struct converter;
-
-    template <typename T, typename Executor, typename Args>
-    struct converter<T, Executor, Args, true, void>
+    struct converter
     {
-        static decltype(auto) convert(T &&callable)
+        static_assert(std::same_as<WithExecutor, apply_failure> && std::same_as<Result, apply_failure>,
+                      "Could not match arguments. Make sure you are using appropiate value categories!");
+    };
+
+    template <typename T, typename Args, typename Executor, typename _>
+    struct converter<T, Args, Executor, apply_success<_>, apply_success<void>>
+    {
+        static decltype(auto) convert(T callable)
         {
-            return std::forward<T>(callable);
+            return callable;
         }
     };
 
-    template <typename T, typename R, typename E, typename... Ts, typename Result>
-    struct converter<T, executor<R, E>, std::tuple<Ts...>, false, Result>
+    template <typename T, typename... Ts, typename R, typename E, typename Result>
+    struct converter<T, std::tuple<Ts...>, executor<R, E>, apply_failure, apply_success<Result>>
     {
-        static decltype(auto) convert(T &&callable)
-            requires std::same_as<Result, R>
+        static decltype(auto) convert(T callable)
         {
-            return [callable = std::forward<T>(callable)](Ts &&...args, auto &&executor) mutable
+            return [callable = std::move(callable)](Ts &&...args, auto &&executor) mutable
             {
                 if constexpr (std::is_void_v<Result>)
                 {
@@ -76,11 +112,11 @@ namespace saucer::traits
     };
 
     template <typename T, typename... Ts, typename R, typename E>
-    struct converter<T, executor<R, E>, std::tuple<Ts...>, false, std::expected<R, E>>
+    struct converter<T, std::tuple<Ts...>, executor<R, E>, apply_failure, apply_success<std::expected<R, E>>>
     {
-        static decltype(auto) convert(T &&callable)
+        static decltype(auto) convert(T callable)
         {
-            return [callable = std::forward<T>(callable)](Ts &&...args, auto &&executor) mutable
+            return [callable = std::move(callable)](Ts &&...args, auto &&executor) mutable
             {
                 std::invoke(callable, std::forward<Ts>(args)...)
                     .transform(executor.resolve)
@@ -91,6 +127,7 @@ namespace saucer::traits
     };
 
     template <typename T, typename Result = result_t<T>, typename Last = tuple::last_t<args_t<T>>>
+        requires(!has_reference_v<raw_args_t<T>>)
     struct resolver
     {
         using args     = args_t<T>;
@@ -99,7 +136,7 @@ namespace saucer::traits
         using executor = saucer::executor<Result, void>;
 
       public:
-        using converter = traits::converter<T, executor, args>;
+        using converter = traits::converter<T, args, executor>;
     };
 
     template <typename T, typename Result, typename R, typename E>
@@ -111,7 +148,7 @@ namespace saucer::traits
         using executor = saucer::executor<R, E>;
 
       public:
-        using converter = traits::converter<T, executor, args>;
+        using converter = traits::converter<T, args, executor>;
     };
 
     template <typename T, typename R, typename E, typename Last>
@@ -123,6 +160,6 @@ namespace saucer::traits
         using executor = saucer::executor<R, E>;
 
       public:
-        using converter = traits::converter<T, executor, args>;
+        using converter = traits::converter<T, args, executor>;
     };
 } // namespace saucer::traits

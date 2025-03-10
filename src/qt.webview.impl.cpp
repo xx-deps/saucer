@@ -1,6 +1,7 @@
 #include "qt.webview.impl.hpp"
 
 #include "scripts.hpp"
+#include "request.hpp"
 
 #include "qt.icon.impl.hpp"
 #include "qt.navigation.impl.hpp"
@@ -16,42 +17,42 @@
 
 namespace saucer
 {
-    const std::string &webview::impl::inject_script()
+    std::string webview::impl::inject_script()
     {
-        static std::optional<std::string> instance;
+        static constexpr auto internal = R"js(
+            channel: new Promise((resolve) =>
+            {
+                new QWebChannel(qt.webChannelTransport, function(channel) {
+                    resolve(channel.objects.saucer);
+                });
+            }),
+            message: async (message) =>
+            {
+                (await window.saucer.internal.channel).on_message(message);
+            }
+        )js";
 
-        if (instance)
+        static const auto web_channel = []
         {
-            return instance.value();
-        }
+            QFile qwebchannel{":/qtwebchannel/qwebchannel.js"};
 
-        QFile qwebchannel{":/qtwebchannel/qwebchannel.js"};
+            if (!qwebchannel.open(QIODevice::ReadOnly))
+            {
+                assert(false && "Failed to open web-channel");
+            }
 
-        if (!qwebchannel.open(QIODevice::ReadOnly))
-        {
-            assert(false && "Failed to open web-channel");
-        }
+            return qwebchannel.readAll().toStdString();
+        }();
 
-        const auto content = qwebchannel.readAll().toStdString();
-        qwebchannel.close();
+        static const auto script = web_channel + fmt::format(scripts::webview_script,            //
+                                                             fmt::arg("internal", internal),     //
+                                                             fmt::arg("stubs", request::stubs()) //
+                                                 );
 
-        instance.emplace(content + fmt::format(scripts::webview_script, fmt::arg("internal", R"js(
-        channel: new Promise((resolve) =>
-        {
-            new QWebChannel(qt.webChannelTransport, function(channel) {
-                resolve(channel.objects.saucer);
-            });
-        }),
-        send_message: async (message) =>
-        {
-            (await window.saucer.internal.channel).on_message(message);
-        }
-        )js")));
-
-        return instance.value();
+        return script;
     }
 
-    constinit std::string_view webview::impl::ready_script = "window.saucer.internal.send_message('dom_loaded')";
+    constinit std::string_view webview::impl::ready_script = "window.saucer.internal.message('dom_loaded')";
 
     webview::impl::web_class::web_class(webview *parent) : m_parent(parent) {}
 
