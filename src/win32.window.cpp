@@ -587,7 +587,7 @@ namespace saucer
     {
         if (!m_parent->thread_safe())
         {
-            return m_parent->dispatch([this, x, y] { set_position_and_size(x, y, w, h); });
+            return m_parent->dispatch([this, x, y, w, h] { set_position_and_size(x, y, w, h); });
         }
 
         SetWindowPos(m_impl->hwnd.get(), nullptr, x, y, w, h, SWP_NOACTIVATE | SWP_NOZORDER);
