@@ -307,7 +307,7 @@ namespace saucer
         {
             return m_parent->dispatch([this] { start_drag(); });
         }
-        
+
         ReleaseCapture();
         SendMessage(m_impl->hwnd.get(), WM_SYSCOMMAND, 0xF012 /*SC_DRAGMOVE*/, 0);
     }
@@ -590,7 +590,7 @@ namespace saucer
             return m_parent->dispatch([this, x, y] { set_position_and_size(x, y, w, h); });
         }
 
-        SetWindowPos(m_impl->hwnd.get(), nullptr, x, y, w, h, SWP_NOSIZE | SWP_NOACTIVATE | SWP_NOZORDER);
+        SetWindowPos(m_impl->hwnd.get(), nullptr, x, y, w, h, SWP_NOACTIVATE | SWP_NOZORDER);
     }
 
     void window::clear(window_event event)
