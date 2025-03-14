@@ -14,8 +14,8 @@ namespace saucer
             .lpfnWndProc   = impl::wnd_proc,
             .hInstance     = m_impl->handle,
             .lpszClassName = m_impl->id.c_str(),
-            .hbrBackground = nullptr,
         };
+        m_impl->wnd_class.hbrBackground = nullptr;
 
         if (!RegisterClassW(&m_impl->wnd_class))
         {
