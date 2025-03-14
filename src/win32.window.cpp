@@ -583,6 +583,16 @@ namespace saucer
         SetWindowPos(m_impl->hwnd.get(), nullptr, x, y, 0, 0, SWP_NOSIZE | SWP_NOACTIVATE | SWP_NOZORDER);
     }
 
+    void window::set_position_and_size(int x, int y, int w, int h)
+    {
+        if (!m_parent->thread_safe())
+        {
+            return m_parent->dispatch([this, x, y] { set_position_and_size(x, y, w, h); });
+        }
+
+        SetWindowPos(m_impl->hwnd.get(), nullptr, x, y, w, h, SWP_NOSIZE | SWP_NOACTIVATE | SWP_NOZORDER);
+    }
+
     void window::clear(window_event event)
     {
         m_events.clear(event);
