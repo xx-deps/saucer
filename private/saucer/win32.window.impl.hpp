@@ -33,5 +33,11 @@ namespace saucer
       public:
         static void set_style(HWND, long);
         static LRESULT CALLBACK wnd_proc(HWND, UINT, WPARAM, LPARAM);
+
+      private:
+        bool isDragging        = false;
+        POINT cursorPrevious   = {0, 0};
+        POINT cursorNow        = {0, 0};
+        POINT windowPostionNow = {0, 0};
     };
 } // namespace saucer

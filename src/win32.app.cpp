@@ -15,6 +15,7 @@ namespace saucer
             .hInstance     = m_impl->handle,
             .lpszClassName = m_impl->id.c_str(),
         };
+        m_impl->wnd_class.hbrBackground = nullptr;
 
         if (!RegisterClassW(&m_impl->wnd_class))
         {
