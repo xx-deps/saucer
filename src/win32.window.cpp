@@ -29,10 +29,10 @@ namespace saucer
                                        m_parent->native<false>()->id.c_str(), //
                                        L"",                                   //
                                        style,                                 //
-                                       0,                                     //
-                                       0,                                     //
-                                       1,                                     //
-                                       1,                                     //
+                                       CW_USEDEFAULT,                         //
+                                       CW_USEDEFAULT,                         //
+                                       CW_USEDEFAULT,                         //
+                                       CW_USEDEFAULT,                               //
                                        nullptr,                               //
                                        nullptr,                               //
                                        m_parent->native<false>()->handle,     //
