@@ -25,7 +25,7 @@ namespace saucer
         m_impl->msg_window = CreateWindowEx(WS_EX_NOREDIRECTIONBITMAP,                  //
                                             m_impl->id.c_str(), //
                                             L"",                //
-                                            0,                  //
+                                            WS_POPUP,                  //
                                             0,                  //
                                             0,                  //
                                             0,                  //
