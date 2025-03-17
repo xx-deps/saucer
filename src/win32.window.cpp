@@ -405,7 +405,19 @@ namespace saucer
         {
             return m_parent->dispatch([this, enabled] { set_always_on_top(enabled); });
         }
+        static constexpr auto flags = WS_EX_TOPMOST;
+        auto current                = GetWindowLongPtr(m_impl->hwnd.get(), GWL_EXSTYLE);
 
+        if (enabled)
+        {
+            current |= flags;
+        }
+        else
+        {
+            current &= ~flags;
+        }
+
+        SetWindowLongPtrW(m_impl->hwnd.get(), GWL_EXSTYLE, current);
         auto *parent = enabled ? HWND_TOPMOST : HWND_NOTOPMOST;
         SetWindowPos(m_impl->hwnd.get(), parent, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOACTIVATE | SWP_NOSIZE);
     }
