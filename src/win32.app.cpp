@@ -22,7 +22,7 @@ namespace saucer
             assert(false && "RegisterClassW() failed");
         }
 
-        m_impl->msg_window = CreateWindowEx(0,                  //
+        m_impl->msg_window = CreateWindowEx(WS_EX_NOREDIRECTIONBITMAP,                  //
                                             m_impl->id.c_str(), //
                                             L"",                //
                                             0,                  //
