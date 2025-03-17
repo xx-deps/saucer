@@ -25,7 +25,7 @@ namespace saucer
     {
         assert(m_parent->thread_safe() && "Construction outside of the main-thread is not permitted");
 
-        m_impl->hwnd = CreateWindowExW(WS_EX_LAYERED | WS_EX_TRANSPARENT,     //
+        m_impl->hwnd = CreateWindowExW(WS_EX_LAYERED,                         //
                                        m_parent->native<false>()->id.c_str(), //
                                        L"",                                   //
                                        style,                                 //
@@ -44,7 +44,6 @@ namespace saucer
 
         utils::set_dpi_awareness();
         m_impl->o_wnd_proc = utils::overwrite_wndproc(m_impl->hwnd.get(), impl::wnd_proc);
-        SetLayeredWindowAttributes(m_impl->hwnd.get(), RGB(0, 0, 0), 0, LWA_COLORKEY | LWA_ALPHA);
         SetWindowLongPtrW(m_impl->hwnd.get(), GWLP_USERDATA, reinterpret_cast<LONG_PTR>(this));
     }
 
@@ -470,7 +469,7 @@ namespace saucer
         {
             return;
         }
-        SetLayeredWindowAttributes(m_impl->hwnd.get(), RGB(0, 0, 0), 0, LWA_COLORKEY | LWA_ALPHA); 
+        SetLayeredWindowAttributes(m_impl->hwnd.get(), RGB(255, 255, 255), 0, LWA_COLORKEY | LWA_ALPHA);
     }
     void window::set_click_through(bool enabled)
     {
@@ -497,7 +496,7 @@ namespace saucer
         {
             return;
         }
-        SetLayeredWindowAttributes(m_impl->hwnd.get(), RGB(0, 0, 0), 0, LWA_COLORKEY | LWA_ALPHA); 
+        SetLayeredWindowAttributes(m_impl->hwnd.get(), RGB(255, 255, 255), 0, LWA_COLORKEY | LWA_ALPHA);
     }
 
     void window::set_icon(const icon &icon)
