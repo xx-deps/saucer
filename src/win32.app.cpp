@@ -22,7 +22,7 @@ namespace saucer
             assert(false && "RegisterClassW() failed");
         }
 
-        m_impl->msg_window = CreateWindowEx(WS_EX_LAYERED | WS_EX_TRANSPARENT,                  //
+        m_impl->msg_window = CreateWindowEx(WS_EX_NOREDIRECTIONBITMAP,                  //
                                             m_impl->id.c_str(), //
                                             L"",                //
                                             WS_POPUP,                  //
