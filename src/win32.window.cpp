@@ -25,7 +25,7 @@ namespace saucer
     {
         assert(m_parent->thread_safe() && "Construction outside of the main-thread is not permitted");
 
-        m_impl->hwnd = CreateWindowExW(WS_EX_LAYERED,                         //
+        m_impl->hwnd = CreateWindowExW(WS_EX_LAYERED | WS_EX_TOPMOST,         //
                                        m_parent->native<false>()->id.c_str(), //
                                        L"",                                   //
                                        style,                                 //
