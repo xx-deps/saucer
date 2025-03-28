@@ -1,7 +1,8 @@
 #pragma once
 
 #include "webview.hpp"
-
+#include <windows.h>
+#include <windef.h>
 #include <wrl.h>
 #include <WebView2.h>
 #include <WebView2EnvironmentOptions.h>
