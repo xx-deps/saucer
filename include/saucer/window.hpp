@@ -120,6 +120,9 @@ namespace saucer
         [[sc::thread_safe]] [[nodiscard]] window_decoration decoration() const;
 
       public:
+        [[sc::thread_safe]] [[nodiscard]] std::pair<int, int> mouse_pos() const;
+
+      public:
         [[sc::thread_safe]] [[nodiscard]] std::pair<int, int> size() const;
         [[sc::thread_safe]] [[nodiscard]] std::pair<int, int> max_size() const;
         [[sc::thread_safe]] [[nodiscard]] std::pair<int, int> min_size() const;
@@ -148,7 +151,8 @@ namespace saucer
       public:
         [[sc::thread_safe]] void set_always_on_top(bool enabled);
         [[sc::thread_safe]] void set_click_through(bool enabled);
-
+        [[sc::thread_safe]] void set_non_clickable(bool enabled);
+        [[sc::thread_safe]] void set_skip_taskbar(bool enabled);
       public:
         [[sc::thread_safe]] void set_icon(const icon &icon);
         [[sc::thread_safe]] void set_title(const std::string &title);
@@ -161,6 +165,7 @@ namespace saucer
 
       public:
         [[sc::thread_safe]] void set_position(int x, int y);
+        [[sc::thread_safe]] void set_position_and_size(int x, int y, int width, int height);
 
       public:
         [[sc::thread_safe]] void clear(window_event event);

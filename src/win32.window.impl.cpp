@@ -1,6 +1,8 @@
 #include "win32.window.impl.hpp"
 
 #include "win32.app.impl.hpp"
+#include <windowsx.h>
+#include <winuser.h>
 
 namespace saucer
 {

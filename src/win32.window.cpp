@@ -12,26 +12,27 @@
 #include <flagpp/flags.hpp>
 
 #include <dwmapi.h>
+#include <winuser.h>
 
 template <>
 constexpr bool flagpp::enabled<saucer::window_edge> = true;
 
 namespace saucer
 {
-    static constexpr auto style = WS_OVERLAPPED | WS_CAPTION | WS_SYSMENU | WS_CLIPSIBLINGS;
+    static constexpr auto style = WS_POPUP;
 
     window::window(const preferences &prefs) : m_impl(std::make_unique<impl>()), m_parent(prefs.application.value())
     {
         assert(m_parent->thread_safe() && "Construction outside of the main-thread is not permitted");
 
-        m_impl->hwnd = CreateWindowExW(WS_EX_NOREDIRECTIONBITMAP,             //
+        m_impl->hwnd = CreateWindowExW(WS_EX_LAYERED,                         //
                                        m_parent->native<false>()->id.c_str(), //
                                        L"",                                   //
                                        style,                                 //
                                        CW_USEDEFAULT,                         //
                                        CW_USEDEFAULT,                         //
                                        CW_USEDEFAULT,                         //
-                                       CW_USEDEFAULT,                         //
+                                       CW_USEDEFAULT,                               //
                                        nullptr,                               //
                                        nullptr,                               //
                                        m_parent->native<false>()->handle,     //
@@ -43,7 +44,6 @@ namespace saucer
 
         utils::set_dpi_awareness();
         m_impl->o_wnd_proc = utils::overwrite_wndproc(m_impl->hwnd.get(), impl::wnd_proc);
-
         SetWindowLongPtrW(m_impl->hwnd.get(), GWLP_USERDATA, reinterpret_cast<LONG_PTR>(this));
     }
 
@@ -164,6 +164,19 @@ namespace saucer
         }
 
         return window_decoration::full;
+    }
+
+    std::pair<int, int> window::mouse_pos() const
+    {
+        if (!m_parent->thread_safe())
+        {
+            return m_parent->dispatch([this] { return mouse_pos(); });
+        }
+
+        POINT point;
+        GetCursorPos(&point);
+
+        return {point.x, point.y};
     }
 
     std::pair<int, int> window::size() const
@@ -391,11 +404,73 @@ namespace saucer
         {
             return m_parent->dispatch([this, enabled] { set_always_on_top(enabled); });
         }
+        static constexpr auto flags = WS_EX_TOPMOST;
+        auto current                = GetWindowLongPtr(m_impl->hwnd.get(), GWL_EXSTYLE);
 
+        if (enabled)
+        {
+            current |= flags;
+        }
+        else
+        {
+            current &= ~flags;
+        }
+
+        SetWindowLongPtrW(m_impl->hwnd.get(), GWL_EXSTYLE, current);
         auto *parent = enabled ? HWND_TOPMOST : HWND_NOTOPMOST;
         SetWindowPos(m_impl->hwnd.get(), parent, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOACTIVATE | SWP_NOSIZE);
     }
 
+    void window::set_skip_taskbar(bool enabled)
+    {
+        if (!m_parent->thread_safe())
+        {
+            return m_parent->dispatch([this, enabled] { set_skip_taskbar(enabled); });
+        }
+
+        static constexpr auto flags = WS_EX_TOOLWINDOW;
+        auto current                = GetWindowLongPtr(m_impl->hwnd.get(), GWL_EXSTYLE);
+
+        if (enabled)
+        {
+            current |= flags;
+        }
+        else
+        {
+            current &= ~flags;
+        }
+
+        SetWindowLongPtrW(m_impl->hwnd.get(), GWL_EXSTYLE, current);
+    }
+
+    void window::set_non_clickable(bool enabled)
+    {
+        if (!m_parent->thread_safe())
+        {
+            m_parent->dispatch([this, enabled] { set_non_clickable(enabled); });
+            return;
+        }
+
+        static constexpr auto flags = WS_EX_TRANSPARENT | WS_EX_LAYERED;
+        auto current                = GetWindowLongPtr(m_impl->hwnd.get(), GWL_EXSTYLE);
+
+        if (enabled)
+        {
+            current |= flags;
+        }
+        else
+        {
+            current &= ~flags;
+        }
+        current |= WS_EX_LAYERED;
+        SetWindowLongPtrW(m_impl->hwnd.get(), GWL_EXSTYLE, current);
+
+        if (!enabled)
+        {
+            return;
+        }
+        SetLayeredWindowAttributes(m_impl->hwnd.get(), RGB(255, 255, 255), 0, LWA_COLORKEY | LWA_ALPHA);
+    }
     void window::set_click_through(bool enabled)
     {
         if (!m_parent->thread_safe())
@@ -421,8 +496,7 @@ namespace saucer
         {
             return;
         }
-
-        SetLayeredWindowAttributes(m_impl->hwnd.get(), RGB(255, 255, 255), 255, 0);
+        SetLayeredWindowAttributes(m_impl->hwnd.get(), RGB(255, 255, 255), 0, LWA_COLORKEY | LWA_ALPHA);
     }
 
     void window::set_icon(const icon &icon)
@@ -517,6 +591,16 @@ namespace saucer
         }
 
         SetWindowPos(m_impl->hwnd.get(), nullptr, x, y, 0, 0, SWP_NOSIZE | SWP_NOACTIVATE | SWP_NOZORDER);
+    }
+
+    void window::set_position_and_size(int x, int y, int w, int h)
+    {
+        if (!m_parent->thread_safe())
+        {
+            return m_parent->dispatch([this, x, y, w, h] { set_position_and_size(x, y, w, h); });
+        }
+
+        SetWindowPos(m_impl->hwnd.get(), nullptr, x, y, w, h, SWP_NOACTIVATE | SWP_NOZORDER);
     }
 
     void window::clear(window_event event)

@@ -9,16 +9,21 @@
 
 #include <cassert>
 
+#include <iostream>
 #include <rebind/utils/enum.hpp>
 
 #include <fmt/core.h>
 #include <fmt/xchar.h>
 
 #include <windows.h>
+#include <windowsx.h>
+#include <GdiplusColor.h>
+#include <commctrl.h>
 #include <gdiplus.h>
-
+#include <windef.h>
 #include <shlwapi.h>
 #include <WebView2EnvironmentOptions.h>
+#include <winuser.h>
 
 namespace saucer
 {
