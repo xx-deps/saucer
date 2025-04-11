@@ -19,6 +19,7 @@
 
 #include <shlwapi.h>
 #include <WebView2EnvironmentOptions.h>
+#include <winuser.h>
 
 namespace saucer
 {
@@ -266,6 +267,11 @@ namespace saucer
         case WM_SHOWWINDOW:
             impl->controller->put_IsVisible(static_cast<BOOL>(w_param));
             break;
+
+        case WM_MOVE: {
+            impl->controller->NotifyParentWindowPositionChanged();
+            break;
+        }
         case WM_SIZE:
             impl->controller->put_IsVisible(w_param != SIZE_MINIMIZED);
             impl->controller->put_Bounds(RECT{0, 0, LOWORD(l_param), HIWORD(l_param)});
