@@ -264,6 +264,18 @@ namespace saucer
 
         switch (msg)
         {
+        case WM_SYSCOMMAND: {
+            if (w_param == SC_MINIMIZE)
+            {
+                // Hide the webview when the app window is minimized.
+                impl->controller->put_IsVisible(FALSE);
+            }
+            else if (w_param == SC_RESTORE)
+            {
+
+                impl->controller->put_IsVisible(TRUE);
+            }
+        }
         case WM_MOVE: {
             impl->controller->NotifyParentWindowPositionChanged();
             break;
