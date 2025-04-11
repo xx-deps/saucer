@@ -267,7 +267,18 @@ namespace saucer
         case WM_SHOWWINDOW:
             impl->controller->put_IsVisible(static_cast<BOOL>(w_param));
             break;
+        case WM_SYSCOMMAND:
+            if (w_param == SC_MINIMIZE)
+            {
 
+                impl->controller->put_IsVisible(FALSE);
+            }
+            else if (w_param == SC_RESTORE)
+            {
+
+                impl->controller->put_IsVisible(TRUE);
+            }
+            break;
         case WM_MOVE: {
             impl->controller->NotifyParentWindowPositionChanged();
             break;
