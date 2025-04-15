@@ -48,7 +48,22 @@ namespace saucer
 
         call_as<DwmSetWindowAttribute>(func, hwnd, immersive_dark, &enable_immersive_dark, sizeof(BOOL));
     }
+    void utils::set_disallow_non_client_area(HWND hwnd)
+    {
+        auto dwmapi = module_handle{LoadLibraryW(L"Dwmapi.dll")};
+        auto *func  = GetProcAddress(dwmapi.get(), "DwmSetWindowAttribute");
 
+        if (!func)
+        {
+            return;
+        }
+
+        // 设置非客户区渲染策略
+        static constexpr auto nc_rendering_policy = DWMWA_NCRENDERING_POLICY;
+        DWORD policy                              = DWMNCRP_DISABLED; // 恢复默认策略
+
+        call_as<DwmSetWindowAttribute>(func, hwnd, nc_rendering_policy, &policy, sizeof(DWORD));
+    }
     void utils::extend_frame(HWND hwnd, std::array<int, 4> area)
     {
         auto dwmapi = module_handle{LoadLibraryW(L"Dwmapi.dll")};
