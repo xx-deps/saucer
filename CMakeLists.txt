@@ -393,7 +393,7 @@ if (saucer_backend STREQUAL "WebKitGtk")
 
   find_package(PkgConfig REQUIRED)
 
-  pkg_check_modules(gtk        REQUIRED gtk4>=4.10)
+  pkg_check_modules(gtk        REQUIRED gtk4>=4.12)
   pkg_check_modules(libadwaita REQUIRED IMPORTED_TARGET libadwaita-1)
   pkg_check_modules(webkitgtk  REQUIRED IMPORTED_TARGET webkitgtk-6.0)
 
@@ -426,7 +426,7 @@ if (saucer_serializer STREQUAL "Glaze")
 
   CPMFindPackage(
     NAME           glaze
-    VERSION        4.4.2
+    VERSION        5.0.1
     GIT_REPOSITORY "https://github.com/stephenberry/glaze"
   )
 
@@ -442,7 +442,7 @@ if (saucer_serializer STREQUAL "Rflpp")
 
   CPMFindPackage(
     NAME           reflectcpp
-    VERSION        0.17.0
+    VERSION        0.18.0
     GIT_REPOSITORY "https://github.com/getml/reflect-cpp"
     SYSTEM         ON
   )

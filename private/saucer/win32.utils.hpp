@@ -18,6 +18,7 @@ namespace saucer::utils
 
     void set_dpi_awareness();
     void set_immersive_dark(HWND, bool);
+    void set_disallow_non_client_area(HWND);
     void extend_frame(HWND, std::array<int, 4>);
 
     [[nodiscard]] WNDPROC overwrite_wndproc(HWND, WNDPROC);

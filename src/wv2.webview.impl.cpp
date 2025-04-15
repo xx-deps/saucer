@@ -268,12 +268,25 @@ namespace saucer
 
         switch (msg)
         {
-        case WM_SHOWWINDOW:
-            impl->controller->put_IsVisible(static_cast<BOOL>(w_param));
+        case WM_SYSCOMMAND: {
+            if (w_param == SC_MINIMIZE)
+            {
+                // Hide the webview when the app window is minimized.
+                impl->controller->put_IsVisible(FALSE);
+            }
+            else if (w_param == SC_RESTORE)
+            {
+
+                impl->controller->put_IsVisible(TRUE);
+            }
+        }
+        case WM_MOVE: {
+            impl->controller->NotifyParentWindowPositionChanged();
             break;
+        }
         case WM_SIZE:
-            impl->controller->put_IsVisible(w_param != SIZE_MINIMIZED);
             impl->controller->put_Bounds(RECT{0, 0, LOWORD(l_param), HIWORD(l_param)});
+            impl->controller->put_IsVisible(w_param != SIZE_MINIMIZED);
             break;
         }
 
