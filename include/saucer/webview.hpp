@@ -119,6 +119,7 @@ namespace saucer
       public:
         [[sc::thread_safe]] void set_force_dark_mode(bool enabled);
         [[sc::thread_safe]] void set_background(const color &color);
+        [[sc::thread_safe]] void set_disallow_non_client_area();
 
       public:
         [[sc::thread_safe]] void set_file(const fs::path &file);

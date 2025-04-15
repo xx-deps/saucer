@@ -312,6 +312,11 @@ namespace saucer
         m_impl->settings->put_AreDefaultContextMenusEnabled(enabled);
     }
 
+    void webview::set_disallow_non_client_area()
+    {
+        utils::set_disallow_non_client_area(window::m_impl->hwnd.get());
+    }
+
     void webview::set_force_dark_mode(bool enabled)
     {
         if (!m_parent->thread_safe())
