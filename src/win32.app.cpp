@@ -12,8 +12,8 @@ namespace saucer
 
         m_impl->wnd_class = {
             .lpfnWndProc   = impl::wnd_proc,
-            .hbrBackground = (HBRUSH)GetStockObject(BLACK_BRUSH),
             .hInstance     = m_impl->handle,
+            .hbrBackground = (HBRUSH)GetStockObject(BLACK_BRUSH),
             .lpszClassName = m_impl->id.c_str(),
         };
 
