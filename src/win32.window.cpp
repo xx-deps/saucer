@@ -12,6 +12,7 @@
 #include <flagpp/flags.hpp>
 
 #include <dwmapi.h>
+#include <winuser.h>
 
 template <>
 constexpr bool flagpp::enabled<saucer::window_edge> = true;
@@ -371,7 +372,7 @@ namespace saucer
             return m_parent->dispatch([this, enabled] { set_resizable(enabled); });
         }
 
-        static constexpr auto flags = WS_THICKFRAME | WS_MINIMIZEBOX | WS_MAXIMIZEBOX;
+        static constexpr auto flags = WS_THICKFRAME | WS_MINIMIZEBOX | WS_MAXIMIZEBOXf;
 
         if (enabled)
         {
