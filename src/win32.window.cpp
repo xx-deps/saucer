@@ -40,7 +40,7 @@ namespace saucer
 
         assert(m_impl->hwnd.get() && "CreateWindowExW() failed");
 
-        // set_resizable(true);
+        set_resizable(true);
 
         utils::set_dpi_awareness();
         m_impl->o_wnd_proc = utils::overwrite_wndproc(m_impl->hwnd.get(), impl::wnd_proc);
