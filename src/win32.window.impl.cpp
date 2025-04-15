@@ -56,7 +56,7 @@ namespace saucer
                 WINDOWINFO info{};
                 GetWindowInfo(hwnd, &info);
 
-                rect->top += keep ? maximized ? 0 : 1 : static_cast<LONG>(info.cxWindowBorders);
+                rect->top +=  keep ? maximized ? 0 : 1 : static_cast<LONG>(info.cxWindowBorders);
                 rect->bottom -= static_cast<LONG>(info.cyWindowBorders);
 
                 rect->left += static_cast<LONG>(info.cxWindowBorders);
