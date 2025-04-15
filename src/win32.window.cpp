@@ -372,7 +372,7 @@ namespace saucer
             return m_parent->dispatch([this, enabled] { set_resizable(enabled); });
         }
 
-        static constexpr auto flags = WS_THICKFRAME | WS_MINIMIZEBOX | WS_MAXIMIZEBOXf;
+        static constexpr auto flags = WS_THICKFRAME | WS_MINIMIZEBOX | WS_MAXIMIZEBOX;
 
         if (enabled)
         {
